@@ -1,4 +1,4 @@
-INSERT INTO department (name)
+INSERT INTO department (dep_name)
 VALUES ('Tech Support'),
 ('Software Intern'),
 ('Software Engineer'),
