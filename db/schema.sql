@@ -4,8 +4,8 @@ CREATE DATABASE employees_db;
 USE employees_db; 
 
 CREATE TABLE department (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(30) NOT NULL
+    id INT PRIMARY KEY AUTO_INCREMENT PRIMARY KEY,
+    dep_name VARCHAR(30) NOT NULL
 );
 
 CREATE TABLE postion (
