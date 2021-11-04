@@ -1,14 +1,14 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
-// const express = require('express');
+const express = require('express');
 
-// const fs = require('fs');
-// const path = require('path');
-// const { get } = require('https');
+const fs = require('fs');
+const path = require('path');
+const { get } = require('https');
 
 let quit_program = false;
 
-// require('dotenv').config();
+require('dotenv').config();
 
 const db = mysql.createConnection(
    {
