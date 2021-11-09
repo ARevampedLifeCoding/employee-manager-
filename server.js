@@ -1,61 +1,28 @@
-const inquirer = require('inquirer');
-const prompts = require('./query/prompts.js');
+require("dotenv").config()
+const db = require("./db")
+const inquirer = require("inquirer")
+const consoleTable = require("console.table")
+const database = require("./db/connections")
 
-let restart = true;
+const config = require("./package.json")
 
-const questions = () => {
-  inquirer.prompt(
-    [
-      {
-        type: 'list',
-        name: 'nextMove',
-        choices: [
-                    'View All Employees', 
-                    'Add Employee', 
-                    'Update Employee Role', 
-                    'View All Roles', 
-                    'Add Role', 
-                    'View All Departments', 
-                    'Add Department', 
-                    'Quit'
-                  ],
-        message: "What would you like to do?"
-      }
+const prompt = () => {
+  inquirer
+  .prompt({
+    name: "choices",
+    type: "list",
+    message: "Choose an option",
+    options: [
+      "View employee",
+      "View department",
+      "View position",
+      "Add employee",
+      "Add department",
+      "Add position",
+      "Delete employee",
+      "Delete department",
+      "Delete position",
+      "Quit"
     ]
-  ).then(async response => {
-    switch(response.nextMove) {
-      case "View All Employees": 
-        await prompts.viewEmployees()
-        break;
-      case "Add Employee": 
-        await prompts.addEmployee();
-        break;
-      case "Update Employee Role": 
-        await prompts.updateRole();
-        break;
-      case "View All Roles": 
-        await prompts.viewRoles();
-        break;
-      case "Add Role": 
-        await prompts.addRole();
-        break;
-      case "View All Departments": 
-        await prompts.viewDepartments();
-        break;
-      case "Add Department": 
-        await prompts.addDepartment();
-        break;
-      case "Quit": 
-        console.log("Exiting program. Goodbye!");
-        restart = false; 
-        break;
-    }
-    if (restart) {
-      init();
-    } else {
-      prompts.endConnection();
-    }
-  });
-};
-
-questions();
+  })
+}
