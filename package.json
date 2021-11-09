@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/ARevampedLifeCoding/employee-manager-/issues"
   },
-  "homepage": "https://github.com/ARevampedLifeCoding/employee-manager-#readme"
+  "homepage": "https://github.com/ARevampedLifeCoding/employee-manager-#readme",
+  "dependencies": {
+    "inquirer": "^8.2.0"
+  }
 }
