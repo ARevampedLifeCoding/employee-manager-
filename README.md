@@ -13,7 +13,7 @@ Track all your departments and employees in one place
 * [Tests](#tests)
     
 ## Installation Guide
-[Video](https://drive.google.com/file/d/1uDRGKChzaMDT5NNoG1tMXaiRnbI9nhe1/view?usp=sharing) <br>
+[Video of project](https://drive.google.com/file/d/1uDRGKChzaMDT5NNoG1tMXaiRnbI9nhe1/view?usp=sharing) <br>
 [Repo](https://github.com/ARevampedLifeCoding/employee-manager-)
 
 ## Instructions
