@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/ARevampedLifeCoding/employee-manager-#readme",
   "dependencies": {
+    "compression": "^1.7.4",
     "console.table": "^0.10.0",
     "inquirer": "^8.2.0",
     "mysql2": "^2.3.3"

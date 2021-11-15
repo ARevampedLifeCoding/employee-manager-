@@ -1,230 +1,177 @@
-require("dotenv").config();
-const db = require("./db");
-const inquirer = require("inquirer");
-const consoleTable = require("console.table");
-const database = require("./db/connections");
+var express = require('express')
+var app = express()
+var compression = require('compression')
+const inquirer = require('inquirer');
+const db = require('./db/connections');
+require('console.table');
+app.use(compression({ filter: shouldCompress }))
+ 
+function shouldCompress (req, res) {
+  if (req.headers['x-no-compression']) {
+    
+    return false
+  }
+ 
+ 
+  return compression.filter(req, res)
+}
 
 
-const config = require("./package.json");
-
-const prompt = () => {
-  inquirer
-    .prompt({
-      name: "choices",
-      type: "list",
-      message: "Choose an option",
-      options: [
-        "View employee",
-        "View department",
-        "View position",
-        "Add employee",
-        "Add department",
-        "Add position",
-        "Delete employee",
-        "Delete department",
-        "Delete position",
-        "Quit",
-      ],
-    })
-    .then((select) => {
-      switch (select.options) {
-        case "View employee":
-          viewEmployee();
-          break;
-        case "View department":
-          viewDepartment();
-          break;
-        case "View position":
-          viewPosition();
-        case "Add employee":
-          addEmployee();
-          break;
-        case "Add department":
-          addDepartment();
-          break;
-        case "Add position":
-          addPosition();
-          break;
-        case "Delete employee":
-          deleteEmployee();
-          break;
-        case "Delete department":
-          deleteDepartment();
-          break;
-        case "Delete position":
-          break;
-          default: "Quit"
-      }
-    });
-};
-
-prompt()
-
-
-const viewAllEmployees = function () {
-  db.viewAllEmployees().then((data) => console.table("\n", data, "\n"));
-  initialPrompt();
-};
-
-const viewByDepartment = () => {
-  db.viewByDepartment().then((data) => console.table("\n", data, "\n"));
-  initialPrompt();
-};
-
-const viewByManager = function () {
-  db.viewByManager(2).then((data) => console.table("\n", data, "\n"));
-  initialPrompt();
-};
-
-const viewAllPosition = function () {
-  db.viewAllPositions().then((data) => console.table("\n", data, "\n"));
-  initialPrompt();
-};
-
-const viewAllDepartments = function () {
-  db.viewAllDepartments().then((data) => console.table("\n", data, "\n"));
-  initialPrompt();
-};
-
-const viewDepartmentSalaries = function () {
-  db.viewDepartmentSalaries().then((data) => console.table("\n", data, "\n"));
-  initialPrompt();
-};
-
-const addEmployee = function () {
-  inquirer
-    .prompt([
-      {
-        name: "firstName",
-        type: "input",
-        message: "What is their first name?",
-      },
-      {
-        name: "lastName",
-        type: "input",
-        message: "What is their last name?",
-      },
-      {
-        name: "occupationId",
-        type: "input",
-        message: "What is their occupation?",
-      },
-      {
-        name: "managerId",
-        type: "list",
-        message: "Select their manager.",
-        choices: ["1", "2", "3"],
-      },
-    ])
-    .then((employee) => {
-      db.addEmployee(employee);
-      console.log(
-        `${employee.firstName} ${employee.lastName} was added to the database.\n`
-      );
-      initialPrompt();
-    });
-};
-
-const addDepartment = function () {
-  inquirer
-    .prompt({
-      name: "departmentName",
-      type: "input",
-      message: "What is the department name?",
-    })
-    .then((answer) => {
-      db.addDepartment(answer);
-      console.log(`${answer.departmentName} was added to the database.\n`);
-      initialPrompt();
-    });
-};
-
-const addPosition = function () {
-  inquirer
-    .prompt([
-      {
-        name: "title",
-        type: "input",
-        message: "What`s the title of this position?",
-      },
-      {
-        name: "salary",
-        type: "number",
-        message: "What is the salary for this position?",
-      },
-      {
-        name: "department_id",
-        type: "list",
-        message: "Choose a department to add the position to.",
-        choices: ["IT", "Finance", "Sales"],
-      },
-    ])
-    .then((answer) => {
-      db.addPosition(answer);
-      console.log(`${answer.title} was added to the database.\n`);
-      initialPrompt();
-    });
-};
-
-const removeEmployee = function () {
-  db.selectAllEmployees().then((employees) => {
-    const employeeChoicesForDelete = employees.map((employee) => ({
-      value: employee.id,
-      name: `${employee.first_name} ${employee.last_name}`,
-    }));
-
-    inquirer
-      .prompt([
+   function runPrompt() {
+    inquirer.prompt([
         {
-          name: "employeeId",
-          type: "list",
-          message: "Who would you like to remove from the roster?",
-          choices: employeeChoicesForDelete,
-        },
-      ])
-      .then((answer) => {
-        db.deleteEmployee(answer);
-        console.log("Employee was removed from the database...\n");
-        initialPrompt();
-      });
-  });
-};
+            type: 'list',
+            name: 'directory',
+            message: 'What would you like to do?',
+            choices: [
+              'View all departments',
+              'View all roles',
+              'View all employees',
+              'Add a department',
+              'Add a role',
+              'Add an employee',
+              'Update employee role',
+              'Quit'
+            ]
+        }
+    ])
+    .then((answers) => {
+      if (answers.directory === 'View all departments') {
+          viewAllDepartments();
+      } else if (answers.directory === 'View all roles') {
+          viewAllRoles();
+      } else if (answers.directory === 'View all employees') {
+          viewAllEmployees();
+      } else if (answers.directory === 'Add a department') {
+          addDepartment();
+      } else if (answers.directory === 'Add a role') {
+          addRole();
+      } else if (answers.directory === 'Add an employee') {
+          addEmployee();
+      } else if (answers.directory === 'Update Employee Role') {
+          updateEmployeeRole();
+      } else if (answers.directory === 'Quit') {
+          quit();
+      }
+  })
+}
+runPrompt();
 
-const changeEmployeePosition = async () => {
-  let employeeList = [];
-  let positionList = [];
-  await database.promise().query(`SELECT concat(first_name, " ", last_name) FROM employee`)
-          .then( ([result]) => {
-            result.forEach(element => {
-            employeeList.push(element[0]);
-            });
-          });
-  await database.promise().query(`SELECT title FROM occupation`)
-    .then( ([rows]) => {
-      rows.forEach(element => {
-        positionList.push(element[0]);
-      });
-    })
-  
-  await inquirer.prompt(
-        [
-          {
-            type: 'list',
-            name: 'employee',
-            choices: employeeList,
-            message: "Which employee's position do you want to update?"
-          },
-          {
-            type: 'list',
-            name: 'newposition',
-            choices: positionList,
-            message: "Which position to you want to assign the selected employee?"
-          }
-        ]
-      ).then( (response) => {
-        database.promise().query(`UPDATE employee
-                  SET occupation_id = (SELECT id FROM occupation WHERE title = '${response.newposition}')
-                  WHERE concat(first_name, " ", last_name) = '${response.employee}'`)
-        console.log(`Updated employee's position`)           
+function viewAllDepartments() {
+  db.findAllDepartments().then(([row]) => {
+    console.table(row);
+  }).then(() => {
+    runPrompt();
+  });
+}
+
+function viewAllRoles() {
+  db.findAllRoles().then(([row]) => {
+    console.table(row);
+  }).then(() => {
+    runPrompt();
+  });
+}
+
+function viewAllEmployees() {
+  db.findAllEmployees().then(([row]) => {
+    console.table(row);
+  }).then(() => {
+    runPrompt();
+  });
+}
+
+function addDepartment() {
+  inquirer.prompt([{
+    name: 'name',
+    message: "Enter new department's name:"
+  }]).then((response) => {
+    db.createDepartment(response).then(() => {
+      runPrompt();
     });
-};
+  });
+}
+
+function addRole() {
+  inquirer.prompt([
+      {
+          name: 'title',
+          message: "Enter new role's name:"
+      },
+      {
+          name: 'salary',
+          message: "Enter new role's salary:"
+      }
+      ]).then((response) => {
+          const newRoleTitle = response.title;
+          const newRoleSalary = response.salary;
+          db.findAllDepartments().then(([row]) => {
+              const department = row;
+              const departmentList = department.map(({ name, id }) => ({
+                  name: name,
+                  value: id
+              }));
+              inquirer.prompt([
+                  {
+                      type: 'list',
+                      name: 'name',
+                      message: 'Choose a department:',
+                      choices: departmentList
+                  }
+              ]).then((res) => {
+                  const newRole = {
+                      departments_id:  res.name,
+                      title: newRoleTitle,
+                      salary: newRoleSalary
+                  };
+                  db.createRole(newRole);
+              }).then(() => runPrompt());
+          });
+      });
+}
+
+function addEmployee() {
+  inquirer.prompt([
+    {
+      name: 'first_name',
+      message: "Enter employee's first name:"
+    },
+    {
+      name: 'last_name',
+      message: "Enter employee's last name:"
+    }
+  ]).then((response) => {
+    const newEmployeeFirstName = response.first_name;
+    const newEmployeeLastName = response.last_name;
+    db.findAllRoles().then(([row]) => {
+      const roles = row;
+      const roleList = roles.map(({ title, id }) => ({
+        name: title,
+        value: id
+      }));
+      inquirer.prompt([
+        {
+            type: 'list',
+            name: 'title',
+            message: 'Choose a role:',
+            choices: roleList
+        }
+      ]).then((respo) => { 
+        const newEmployee = {
+            role_id:  respo.title,
+            first_name: newEmployeeFirstName,
+            last_name: newEmployeeLastName
+           
+        };
+        db.createEmployee(newEmployee);
+      }).then(() => runPrompt());
+    })
+  })
+}
+
+
+
+function quit() {
+  console.log('Bye');
+  process.exit();
+}
